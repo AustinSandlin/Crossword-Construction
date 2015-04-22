@@ -1,3 +1,6 @@
+#ifndef _WORD_H
+#define _WORD_H
+
 #include <string>
 
 using namespace std;
@@ -15,3 +18,5 @@ struct Word {
     
         void setUsed(bool u);
 };
+
+#endif

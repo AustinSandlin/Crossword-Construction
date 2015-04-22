@@ -27,11 +27,13 @@ bool Crossword::fillPuzzle(int index) {
         return true;
     }
     
+    vector<Word> words = dict.getWordsByLength(spaces[index].getLength());
+
     //DON'T TRY EVERY WORD, TRY WORDS THAT FIT THIS ONE
     for(int i = 0; i < words.size(); ++i) {
         if(canWordFit(words[i], spaces[index])) {
             insertWord(words[i], spaces[index]);
-            
+
             if(fillPuzzle(index+1)) {
                 return true;
             }
@@ -41,10 +43,10 @@ bool Crossword::fillPuzzle(int index) {
     return false;
 }
 
-Crossword::Crossword(string filename) {
+Crossword::Crossword(string board_file, string dict_file) {
     // *TODO* Add file checking.
     ifstream infile;
-    infile.open(filename.c_str());
+    infile.open(board_file.c_str());
 
     int length;
     infile >> length;
@@ -60,6 +62,8 @@ Crossword::Crossword(string filename) {
             numCharsUsed[i][j] = 0;
         }
     }
+
+    dict.open(dict_file.c_str());
 
     initialize();
 }
@@ -92,7 +96,7 @@ void Crossword::reset() {
     initialize();
 }
 
-bool Crossword::canWordFit(Word w, Space s) {
+bool Crossword::canWordFit(Word& w, Space s) {
     if(w.getWord().size() != s.getLength() || w.isUsed()) {
         return false;
     }
@@ -109,7 +113,7 @@ bool Crossword::canWordFit(Word w, Space s) {
     return true;
 }
 
-void Crossword::insertWord(Word w, Space s) {
+void Crossword::insertWord(Word& w, Space s) {
     Point position = s.getStart();
     
     for(int i = 0; i < s.getLength(); ++i) {
@@ -122,12 +126,12 @@ void Crossword::insertWord(Word w, Space s) {
     w.setUsed(true);
 }
 
-void Crossword::removeWord(Word w, Space s) {
+void Crossword::removeWord(Word& w, Space s) {
     Point position = s.getStart();
     
     for(int i = 0; i < s.getLength(); ++i) {
         --numCharsUsed[position.i][position.j];
-        if(numCharsUsed[position.i][position.j]) {
+        if(numCharsUsed[position.i][position.j] == 0) {
             board[position.i][position.j] = BLANK;
         }
         position.i += s.getDirection().i;

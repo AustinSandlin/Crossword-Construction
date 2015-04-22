@@ -1,3 +1,6 @@
+#ifndef _SPACE_H
+#define _SPACE_H
+
 struct Point {
 	public:
 		int i;
@@ -21,3 +24,5 @@ struct Space {
 		Point getDirection();
 		int getLength() ;
 };
+
+#endif

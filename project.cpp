@@ -7,10 +7,12 @@ using namespace std;
 const int SCREEN_WIDTH = 768;
 const int SCREEN_HEIGHT = 768;
 
+enum GAME_STATE{EMPTY_BOARD, };
+
 Crossword* puzzle;
 
-void init(string filename) {
-	puzzle = new Crossword(filename);
+void init(string board_file, string dict_file) {
+	puzzle = new Crossword(board_file, dict_file);
 
 	// cout << "Validity Check: " << puzzle->isValid() << endl;
 
@@ -36,6 +38,15 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	if(key == 'q' || key == 'Q') {
 		exit(1);
 	}
+    else if(key == 's' || key == 'S') {
+        if(puzzle->isValid()) {
+            cout << "valid" << endl;
+        }
+        else {
+            cout << "invalid" << endl;
+        }
+        glutPostRedisplay();
+    }
 }
 
 void displayCallback() {
@@ -47,20 +58,25 @@ void displayCallback() {
 	puzzle->draw();
 
     glutSwapBuffers();
+
+    glutPostRedisplay();
 }
 
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-    string filename;
-    if(argc < 2) {
-        cout << "Please enter a filename: " << endl;
-        cin >> filename;
+    string board_file, dict_file;
+    if(argc < 3) {
+        cout << "Please enter a filename for the crossword board: " << endl;
+        cin >> board_file;
+        cout << "Please enter a filename for the dictionary: " << endl;
+        cin >> dict_file;
     }
     else {
-        filename = argv[1];
+        board_file = argv[1];
+        dict_file = argv[2];
     }
-	init(filename);
+	init(board_file, dict_file);
 
     glutKeyboardFunc(keyboardCallback);
     glutDisplayFunc(displayCallback);

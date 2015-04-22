@@ -14,12 +14,12 @@ void Dictionary::open(string filename) {
 	
 	string temp;
 	while(infile >> temp) {
-		wordMap[temp.size()].push_back(temp);
+		wordMap[temp.size()].push_back(Word(temp));
 	}
 	
 	infile.close();
 }
 
-vector<string> Dictionary::getWordsByLength(int length) {
+vector<Word>& Dictionary::getWordsByLength(int length) {
 	return wordMap[length];
 }

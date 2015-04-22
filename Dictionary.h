@@ -1,18 +1,24 @@
+#ifndef _DICTIONARY_H
+#define _DICTIONARY_H
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
+#include "Word.h"
 
 using namespace std;
 
 class Dictionary {
 	private:
-		map<int, vector<string> > wordMap;
+		map<int, vector<Word> > wordMap;
 
 	public:
 		Dictionary();
-		Dictionary(string filename);
+		Dictionary(string);
 		
-		void open(string filename);
-		vector<string> getWordsByLength(int length);
+		void open(string);
+		vector<Word>& getWordsByLength(int);
 };
+
+#endif
