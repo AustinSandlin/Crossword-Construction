@@ -1,6 +1,6 @@
 #include <iostream>
 #include <GLUT/glut.h>
-#include "CrosswordPuzzle.h"
+#include "Crossword.h"
 
 using namespace std;
 
@@ -52,7 +52,14 @@ void displayCallback() {
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-	string filename = argv[1];
+    string filename;
+    if(argc < 2) {
+        cout << "Please enter a filename: " << endl;
+        cin >> filename;
+    }
+    else {
+        filename = argv[1];
+    }
 	init(filename);
 
     glutKeyboardFunc(keyboardCallback);

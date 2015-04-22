@@ -10,24 +10,9 @@ class Dictionary {
 		map<int, vector<string> > wordMap;
 
 	public:
-		Dictionary() {
-
-		}
-		Dictionary(string filename) {
-			open(filename);
-		}
+		Dictionary();
+		Dictionary(string filename);
 		
-		void open(string filename) {
-			ifstream infile(filename.c_str());
-			
-			string temp;
-			while(infile >> temp) {
-				wordMap[temp.size()].push_back(temp);
-			}
-			
-			infile.close();
-		}
-		vector<string> getWordsByLength(int length) {
-			return wordMap[length];
-		}
+		void open(string filename);
+		vector<string> getWordsByLength(int length);
 };

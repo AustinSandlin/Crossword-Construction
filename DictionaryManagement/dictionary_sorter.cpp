@@ -23,10 +23,10 @@ int main() {
 
 	vector<string> list;
 	ifstream infile;
-	infile.open("dictionary.txt");
+	infile.open("dictionary_unsorted.txt");
 
 	ofstream outfile;
-	outfile.open("dictionary_sorted.txt");
+	outfile.open("../dictionary_sorted.txt");
 
 	string temp;
 	while(infile >> temp){

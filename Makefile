@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-std=c++11 -Wall -Wno-deprecated
 LDFLAGS=-framework GLUT -framework OpenGL -framework Cocoa
-SOURCES=project.cpp
+SOURCES=project.cpp Crossword.cpp Space.cpp Word.cpp Dictionary.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=project
 
