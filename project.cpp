@@ -1,25 +1,18 @@
 #include <iostream>
 #include <GLUT/glut.h>
-#include "Board.h"
+#include "CrosswordPuzzle.h"
 
 using namespace std;
 
 const int SCREEN_WIDTH = 768;
 const int SCREEN_HEIGHT = 768;
 
-Board* board;
+Crossword* puzzle;
 
-void init() {
+void init(string filename) {
+	puzzle = new Crossword(filename);
 
-	int width;
-	cin >> width;
-
-	board = new Board(width);
-	board->read(cin);
-
-	vector<Word> wordlist = board->getWords();
-
-	cout << "Validity Check: " << board->isValidBoard() << endl;
+	// cout << "Validity Check: " << puzzle->isValid() << endl;
 
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -33,7 +26,7 @@ void init() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluOrtho2D(0, 64*width, 0, 64*width);
+    gluOrtho2D(0, 64*puzzle->getWidth(), 0, 64*puzzle->getWidth());
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -51,7 +44,7 @@ void displayCallback() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-	board->draw(64);
+	puzzle->draw();
 
     glutSwapBuffers();
 }
@@ -59,7 +52,8 @@ void displayCallback() {
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 
-	init();
+	string filename = argv[1];
+	init(filename);
 
     glutKeyboardFunc(keyboardCallback);
     glutDisplayFunc(displayCallback);
