@@ -1,10 +1,13 @@
-#include "Crossword.h"
 
+#include "Crossword.h"
+/* Function for comparing spaces. */
 bool compareSpaces(Space i, Space j) {
     return j.getLength() < i.getLength();
 }
 
 void Crossword::initialize() {
+    /* Find all the spaces on the board. 
+     */
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
             if(board[i][j] == BLANK && ((i-1 < 0 || ((i-1) >= 0 && board[i-1][j] == FILLED)) && (i+1) < width && board[i+1][j] == BLANK)) {
@@ -24,26 +27,39 @@ void Crossword::initialize() {
         }
     }
 
+    /* Sort the spaces, largest first. This is a general improvement in the
+     * solution finding, since there usually are fewer large words. 
+     */
     stable_sort(spaces.begin(), spaces.end(), compareSpaces);
 }
 
 bool Crossword::fillPuzzle(int index) {
+    /* If we reached the end of the spaces vector, we found a solution.
+     */
     if(index == spaces.size()) {
         return true;
     }
     
-    // vector<Word>& words = wordMap[spaces[index].getLength()];
+    // Fetch the length for fewer map lookups.
     int length = spaces[index].getLength();
-    //DON'T TRY EVERY WORD, TRY WORDS THAT FIT THIS ONE
+
+    // For each word that matches the slot's length:
     for(int i = 0; i < wordMap[length].size(); ++i) {
+        // And if the word can fit in the slot:
         if(canWordFit(wordMap[length][i], spaces[index])) {
+            // Insert the word into the slot.
             insertWord(wordMap[length][i], spaces[index]);
+
+            // Draw the board. This is only possible because 
+            draw(true);
 
             if(fillPuzzle(index+1)) {
                 return true;
             }
 
             removeWord(wordMap[length][i], spaces[index]);
+
+            draw(true);
         }
     }
     return false;
@@ -174,7 +190,7 @@ void Crossword::removeWord(Word& w, Space s) {
     w.setUsed(false);
 }
 
-void Crossword::draw() {
+void Crossword::draw(bool swapBuffers) {
     for(int i = width; i > 0; --i) {
         for(int j = 0; j < width; ++j) {
             if(board[width-i][j] != FILLED) {
@@ -202,6 +218,25 @@ void Crossword::draw() {
                 glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, temp);
             }
         }
+    }
+
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_QUADS);
+    glVertex2i(0, -100);
+    glVertex2i(boxSize*width, -100);
+    glVertex2i(boxSize*width, 0);
+    glVertex2i(0, 0);
+    glEnd();
+
+    glColor3f(1.0, 0.0, 0.0);
+    string temp = "PROCESSING";
+    glRasterPos2i(384, -38);
+    for(int i = 0; i < temp.size(); ++i) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, temp[i]);
+    }
+
+    if(swapBuffers) {
+        glutSwapBuffers();
     }
 
     /*
