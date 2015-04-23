@@ -3,19 +3,18 @@
 void Crossword::initialize() {
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
-            if(board[i][j] == '0' && ((i-1 < 0 || ((i-1) >= 0 && board[i-1][j] == '1')) && (i+1) < width && board[i+1][j] == '0')) {
+            if(board[i][j] == BLANK && ((i-1 < 0 || ((i-1) >= 0 && board[i-1][j] == FILLED)) && (i+1) < width && board[i+1][j] == BLANK)) {
                 int length = 1;
-                while(i+length < width && board[i+length][j] == '0') {
+                while(i+length < width && board[i+length][j] == BLANK) {
                     ++length;
                 }
                 spaces.push_back(Space(Point(i, j), Point(1, 0), length));
             }
-            if(board[i][j] == '0' && ((j-1 < 0 || ((j-1) >= 0 && board[i][j-1] == '1')) && (j+1) < width && board[i][j+1] == '0')) {
+            if(board[i][j] == BLANK && ((j-1 < 0 || ((j-1) >= 0 && board[i][j-1] == FILLED)) && (j+1) < width && board[i][j+1] == BLANK)) {
                 int length = 1;
-                while(j+length < width && board[i][j+length] == '0') {
+                while(j+length < width && board[i][j+length] == BLANK) {
                     ++length;
                 }
-
                 spaces.push_back(Space(Point(i, j), Point(0, 1), length));
             }
         }
@@ -27,17 +26,18 @@ bool Crossword::fillPuzzle(int index) {
         return true;
     }
     
-    vector<Word> words = dict.getWordsByLength(spaces[index].getLength());
-
+    // vector<Word>& words = wordMap[spaces[index].getLength()];
+    int length = spaces[index].getLength();
     //DON'T TRY EVERY WORD, TRY WORDS THAT FIT THIS ONE
-    for(int i = 0; i < words.size(); ++i) {
-        if(canWordFit(words[i], spaces[index])) {
-            insertWord(words[i], spaces[index]);
+    for(int i = 0; i < wordMap[length].size(); ++i) {
+        if(canWordFit(wordMap[length][i], spaces[index])) {
+            insertWord(wordMap[length][i], spaces[index]);
 
             if(fillPuzzle(index+1)) {
                 return true;
             }
-            removeWord(words[i], spaces[index]);
+
+            removeWord(wordMap[length][i], spaces[index]);
         }
     }
     return false;
@@ -63,7 +63,18 @@ Crossword::Crossword(string board_file, string dict_file) {
         }
     }
 
-    dict.open(dict_file.c_str());
+    infile.close();
+    infile.clear();
+
+    infile.open(dict_file.c_str());
+    
+    string temp;
+    while(infile >> temp) {
+        wordMap[temp.size()].push_back(Word(temp));
+    }
+    
+    infile.close();
+
 
     initialize();
 }
@@ -90,14 +101,32 @@ void Crossword::reset() {
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
             numCharsUsed[i][j] = 0;
+            if(board[i][j] != '1') {
+                board[i][j] = '0';
+            }
         }
     }
-    
-    initialize();
+    map<int, vector<Word> >::iterator it = wordMap.begin();
+    while(it != wordMap.end()){
+        for(int i = 0; i < it->second.size(); ++i) {
+            it->second[i].setUsed(false);
+        }
+        ++it;
+    }
+}
+
+void Crossword::shuffle() {
+    reset();
+    map<int, vector<Word> >::iterator it = wordMap.begin();
+    while(it != wordMap.end()){
+        random_shuffle(it->second.begin(), it->second.end());
+        ++it;
+    }
+    fillPuzzle(0);
 }
 
 bool Crossword::canWordFit(Word& w, Space s) {
-    if(w.getWord().size() != s.getLength() || w.isUsed()) {
+    if(w.isUsed()) {
         return false;
     }
     Point position = s.getStart();
@@ -128,7 +157,7 @@ void Crossword::insertWord(Word& w, Space s) {
 
 void Crossword::removeWord(Word& w, Space s) {
     Point position = s.getStart();
-    
+
     for(int i = 0; i < s.getLength(); ++i) {
         --numCharsUsed[position.i][position.j];
         if(numCharsUsed[position.i][position.j] == 0) {
@@ -144,7 +173,7 @@ void Crossword::removeWord(Word& w, Space s) {
 void Crossword::draw() {
     for(int i = width; i > 0; --i) {
         for(int j = 0; j < width; ++j) {
-            if(board[width-i][j] != '1') {
+            if(board[width-i][j] != FILLED) {
                 glColor3f(1.0, 1.0, 1.0);
                 glBegin(GL_QUADS);
                 glVertex2i(j*boxSize+1, i*boxSize-1);
@@ -161,10 +190,12 @@ void Crossword::draw() {
                 glVertex2i(j*boxSize+boxSize-1, i*boxSize-1);
                 glEnd();
             }
-            if(board[width-i][j] != '0') {
+            if(board[width-i][j] != BLANK) {
                 glColor3f(0.0, 0.0, 0.0);
                 glRasterPos2i(j*boxSize+24, i*boxSize-40);
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, board[width-i][j]);
+                char temp = board[width-i][j];
+                temp &= 0xFFDF;
+                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, temp);
             }
         }
     }
@@ -178,12 +209,12 @@ void Crossword::draw() {
             }
         }
         if(!numberWritten) {
-            glRasterPos2i(spaces[i].getStart().j*boxSize+4, (width-spaces[i].getStart().i)*boxSize-10);
+            glRasterPos2i(spaces[i].getStart().j*boxSize+4, (width-spaces[i].getStart().i)*boxSize-12);
 
             int num = ++wordCount;
             string s = "";
             while(num != 0) {
-                char c = '0';
+                char c = BLANK;
                 c += (num%10);
                 num /= 10;
                 s = c + s;

@@ -2,11 +2,13 @@
 #define _CROSSWORD_H
 
 #include <GLUT/glut.h>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "Dictionary.h"
+#include <map>
 #include "Space.h"
+#include "Word.h"
 
 using namespace std;
 
@@ -20,7 +22,7 @@ class Crossword {
 		char** board;
 		int** numCharsUsed;
 		vector<Space> spaces;
-		Dictionary dict;
+		map<int, vector<Word> > wordMap;
 		
 		void initialize();
 		bool fillPuzzle(int);
@@ -33,6 +35,7 @@ class Crossword {
 		int getWidth();
 		
 		void reset();
+		void shuffle();
 		
 		bool canWordFit(Word&, Space);
 		void insertWord(Word&, Space);

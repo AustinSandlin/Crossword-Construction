@@ -38,7 +38,13 @@ void keyboardCallback(unsigned char key, int x, int y) {
 	if(key == 'q' || key == 'Q') {
 		exit(1);
 	}
+    else if(key == 'r' || key == 'R') {
+        puzzle->reset();
+    }
     else if(key == 's' || key == 'S') {
+        puzzle->shuffle();
+    }
+    else if(key == 'v' || key == 'V') {
         if(puzzle->isValid()) {
             cout << "valid" << endl;
         }
