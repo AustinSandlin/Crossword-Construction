@@ -1,5 +1,9 @@
 #include "Crossword.h"
 
+bool compareSpaces(Space i, Space j) {
+    return j.getLength() < i.getLength();
+}
+
 void Crossword::initialize() {
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
@@ -19,6 +23,8 @@ void Crossword::initialize() {
             }
         }
     }
+
+    stable_sort(spaces.begin(), spaces.end(), compareSpaces);
 }
 
 bool Crossword::fillPuzzle(int index) {
@@ -75,7 +81,6 @@ Crossword::Crossword(string board_file, string dict_file) {
     
     infile.close();
 
-
     initialize();
 }
 
@@ -122,7 +127,6 @@ void Crossword::shuffle() {
         random_shuffle(it->second.begin(), it->second.end());
         ++it;
     }
-    fillPuzzle(0);
 }
 
 bool Crossword::canWordFit(Word& w, Space s) {
@@ -199,6 +203,8 @@ void Crossword::draw() {
             }
         }
     }
+
+    /*
     glColor3f(0.0, 0.0, 0.0);
     int wordCount = 0;
     for(int i = 0; i < spaces.size(); ++i) {
@@ -224,4 +230,5 @@ void Crossword::draw() {
             }
         }
     }
+    */
 }

@@ -28,7 +28,7 @@ void init(string board_file, string dict_file) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluOrtho2D(0, 64*puzzle->getWidth(), 0, 64*puzzle->getWidth());
+    gluOrtho2D(0, boxSize*puzzle->getWidth(), 0, boxSize*puzzle->getWidth());
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

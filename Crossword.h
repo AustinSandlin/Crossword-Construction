@@ -40,7 +40,7 @@ class Crossword {
 		bool canWordFit(Word&, Space);
 		void insertWord(Word&, Space);
 		void removeWord(Word&, Space);
-		
+
 		//COPY OVER
 		void draw();
 };

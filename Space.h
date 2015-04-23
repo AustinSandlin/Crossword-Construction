@@ -22,7 +22,7 @@ struct Space {
 	
 		Point getStart();	
 		Point getDirection();
-		int getLength() ;
+		int getLength();
 };
 
 #endif
