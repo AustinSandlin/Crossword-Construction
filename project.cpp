@@ -5,7 +5,12 @@
  */
 
 #include <iostream>
+#if __APPLE__
+#include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 #include "Crossword.h"
 
 using namespace std;

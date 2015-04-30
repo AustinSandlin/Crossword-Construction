@@ -7,7 +7,12 @@
 #ifndef _CROSSWORD_H
 #define _CROSSWORD_H
 
+#if __APPLE__
+#include <OpenGL/OpenGL.h>
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 #include <algorithm>
 #include <iostream>
 #include <fstream>
