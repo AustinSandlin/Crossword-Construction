@@ -1,13 +1,17 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: The cpp file for the crossword class. It stores the
+ *              dictionary and the board and does the calculations. 
+ */
 
-#include "Crossword.h"
-/* Function for comparing spaces. */
+include "Crossword.h"
+// Function for comparing spaces.
 bool compareSpaces(Space i, Space j) {
     return j.getLength() < i.getLength();
 }
 
 void Crossword::initialize() {
-    /* Find all the spaces on the board. 
-     */
+    // Find all the spaces on the board. 
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
             if(board[i][j] == BLANK && ((i-1 < 0 || ((i-1) >= 0 && board[i-1][j] == FILLED)) && (i+1) < width && board[i+1][j] == BLANK)) {
@@ -27,15 +31,13 @@ void Crossword::initialize() {
         }
     }
 
-    /* Sort the spaces, largest first. This is a general improvement in the
-     * solution finding, since there usually are fewer large words. 
-     */
+    // Sort the spaces, largest first. This is a general improvement in the
+    // solution finding, since there usually are fewer large words. 
     stable_sort(spaces.begin(), spaces.end(), compareSpaces);
 }
 
 bool Crossword::fillPuzzle(int index) {
-    /* If we reached the end of the spaces vector, we found a solution.
-     */
+    // If we reached the end of the spaces vector, we found a solution.
     if(index == spaces.size()) {
         return true;
     }
@@ -50,15 +52,20 @@ bool Crossword::fillPuzzle(int index) {
             // Insert the word into the slot.
             insertWord(wordMap[length][i], spaces[index]);
 
-            // Draw the board. This is only possible because 
+            // Draw the board. This is only possible because this is called in
+            // the OpenGL draw.
             draw(true);
 
+            // Do the recursion for the next word.
             if(fillPuzzle(index+1)) {
                 return true;
             }
 
+            // If we reach here, that means the word failed, so we need to
+            // remove it.
             removeWord(wordMap[length][i], spaces[index]);
 
+            // Re-draw after we delete the word.
             draw(true);
         }
     }
@@ -66,13 +73,17 @@ bool Crossword::fillPuzzle(int index) {
 }
 
 Crossword::Crossword(string board_file, string dict_file) {
-    // *TODO* Add file checking.
+
+    // Open the board file given.
     ifstream infile;
     infile.open(board_file.c_str());
 
+    // Fetch the width of the board.
     int length;
     infile >> length;
 
+    // Create the board and the board that keeps track of how many characters
+    // are at a location.
     width = length;
     board = new char*[width];
     numCharsUsed = new int*[width];
@@ -85,11 +96,14 @@ Crossword::Crossword(string board_file, string dict_file) {
         }
     }
 
+    // Close the file and clear for reuse.
     infile.close();
     infile.clear();
 
+    // Open the dictionary file.
     infile.open(dict_file.c_str());
-    
+        
+    // Read in all the words to the map.
     string temp;
     while(infile >> temp) {
         wordMap[temp.size()].push_back(Word(temp));
@@ -101,6 +115,7 @@ Crossword::Crossword(string board_file, string dict_file) {
 }
 
 Crossword::~Crossword() {
+    // Make sure no leaks occur.
     for(int i = 0; i < width; ++i) {
         delete[] board;
         delete[] numCharsUsed;
@@ -110,15 +125,18 @@ Crossword::~Crossword() {
 }
 
 bool Crossword::isValid() {
+    // Reset the board before attempting and then refill.
     reset();
     return fillPuzzle(0);
 }
 
 int Crossword::getWidth() {
+    // Return the width of the board.
     return width;
 }
 
 void Crossword::reset() {
+    // Clear the board.
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < width; ++j) {
             numCharsUsed[i][j] = 0;
@@ -127,6 +145,7 @@ void Crossword::reset() {
             }
         }
     }
+    // Clear the words being used.
     map<int, vector<Word> >::iterator it = wordMap.begin();
     while(it != wordMap.end()){
         for(int i = 0; i < it->second.size(); ++i) {
@@ -137,6 +156,8 @@ void Crossword::reset() {
 }
 
 void Crossword::shuffle() {
+    // Reset the board and then shuffle the words. This allows for different
+    // output since the algorithm finds the first build that works.
     reset();
     map<int, vector<Word> >::iterator it = wordMap.begin();
     while(it != wordMap.end()){
@@ -146,11 +167,14 @@ void Crossword::shuffle() {
 }
 
 bool Crossword::canWordFit(Word& w, Space s) {
+    // If the word is used, we can't use it.
     if(w.isUsed()) {
         return false;
     }
+    // Get the start position.
     Point position = s.getStart();
     
+    // Try to insert the word character by character.
     for(int i = 0; i < s.getLength(); ++i) {
         if(board[position.i][position.j] != BLANK &&
            board[position.i][position.j] != w.getWord()[i]) {
@@ -163,6 +187,8 @@ bool Crossword::canWordFit(Word& w, Space s) {
 }
 
 void Crossword::insertWord(Word& w, Space s) {
+    // Insert the word character by character and increment the number of
+    // characters at that location.
     Point position = s.getStart();
     
     for(int i = 0; i < s.getLength(); ++i) {
@@ -176,6 +202,8 @@ void Crossword::insertWord(Word& w, Space s) {
 }
 
 void Crossword::removeWord(Word& w, Space s) {
+    // Remove the number of characters at each location and if the number is 0,
+    // clear the space.
     Point position = s.getStart();
 
     for(int i = 0; i < s.getLength(); ++i) {
@@ -191,6 +219,7 @@ void Crossword::removeWord(Word& w, Space s) {
 }
 
 void Crossword::draw(bool swapBuffers) {
+    // Draw the white boxes and the characters.
     for(int i = width; i > 0; --i) {
         for(int j = 0; j < width; ++j) {
             if(board[width-i][j] != FILLED) {
@@ -220,6 +249,7 @@ void Crossword::draw(bool swapBuffers) {
         }
     }
 
+    // Draw the black box at the bottom.
     glColor3f(0.0, 0.0, 0.0);
     glBegin(GL_QUADS);
     glVertex2i(0, -100);
@@ -228,6 +258,7 @@ void Crossword::draw(bool swapBuffers) {
     glVertex2i(0, 0);
     glEnd();
 
+    // Draw processing by default.
     glColor3f(1.0, 0.0, 0.0);
     string temp = "PROCESSING";
     glRasterPos2i(384, -38);
@@ -235,35 +266,8 @@ void Crossword::draw(bool swapBuffers) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, temp[i]);
     }
 
+    // This bool controls swapping buffers in here.
     if(swapBuffers) {
         glutSwapBuffers();
     }
-
-    /*
-    glColor3f(0.0, 0.0, 0.0);
-    int wordCount = 0;
-    for(int i = 0; i < spaces.size(); ++i) {
-        bool numberWritten = false;
-        for(int j = 0; i != 0 && j < i; ++j) {
-            if(spaces[i].getStart().i == spaces[j].getStart().i && spaces[i].getStart().j == spaces[j].getStart().j) {
-                numberWritten = true;
-            }
-        }
-        if(!numberWritten) {
-            glRasterPos2i(spaces[i].getStart().j*boxSize+4, (width-spaces[i].getStart().i)*boxSize-12);
-
-            int num = ++wordCount;
-            string s = "";
-            while(num != 0) {
-                char c = BLANK;
-                c += (num%10);
-                num /= 10;
-                s = c + s;
-            }
-            for(int j = 0; j < s.size(); ++j) {
-                glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_10, s[j]);
-            }
-        }
-    }
-    */
 }

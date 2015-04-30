@@ -1,3 +1,9 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: This file is the main file that runs the program and deals with
+ *              the graphics behind the program.
+ */
+
 #include <iostream>
 #include <GLUT/glut.h>
 #include "Crossword.h"

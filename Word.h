@@ -1,3 +1,9 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: This is the blank word, stores the string and whether or not
+ *              it's being used in the crossword.
+ */
+
 #ifndef _WORD_H
 #define _WORD_H
 

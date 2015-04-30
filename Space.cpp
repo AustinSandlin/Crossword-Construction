@@ -1,3 +1,9 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: This is the blank space in the crossword, it has the start
+ *				location, the direction, as well as how long the word is.
+ */
+
 #include "Space.h"
 
 Point::Point() {

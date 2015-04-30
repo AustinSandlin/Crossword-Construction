@@ -1,3 +1,9 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: This is the blank word, stores the string and whether or not
+ *              it's being used in the crossword.
+ */
+
 #include "Word.h"
 
 Word::Word(string w) {

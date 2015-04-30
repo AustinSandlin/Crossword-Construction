@@ -1,3 +1,9 @@
+/* Author: Austin Sandlin & Victoria Chuba
+ * Title: Crossword Solver
+ * Description: The header file for the crossword class. It stores the
+ * 				dictionary and the board and does the calculations. 
+ */
+
 #ifndef _CROSSWORD_H
 #define _CROSSWORD_H
 
