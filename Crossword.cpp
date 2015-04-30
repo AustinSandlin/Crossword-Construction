@@ -4,7 +4,7 @@
  *              dictionary and the board and does the calculations. 
  */
 
-include "Crossword.h"
+#include "Crossword.h"
 // Function for comparing spaces.
 bool compareSpaces(Space i, Space j) {
     return j.getLength() < i.getLength();
